@@ -1,0 +1,129 @@
+import React, { useEffect, useMemo, useState } from 'react';
+import axiosInstance from '../../../../services/api';
+import CustomModal from '../../../../components/molecules/CustomModal/CustomModal';
+import { MODALS } from '../../../../shared/Constant';
+import Loader from '../../../../components/atoms/Loader/Loader';
+import SearchInput from '../../../../components/atoms/SearchInput/SearchInput';
+import { debounce } from '../../../../shared/Untils';
+
+function ContactsModal({ modalType, onClose }) {
+  const [contactList, setContactList] = useState({
+    contacts_ids: [],
+  });
+  const [contactsDetail, setContactsDetail] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [pageMeta, setPageMeta] = useState({
+    currentPage: 1,
+    total: 0,
+  });
+
+  const getContacts = (search) => {
+    const query = {
+      page: pageMeta.currentPage,
+      companyId: 171,
+      noGroupDuplicates: 1,
+    };
+    if (modalType === MODALS.MODAL_B) {
+      query.countryId = 226;
+    }
+    if (search) {
+      query.query = search;
+    }
+    
+    axiosInstance
+      .get('http://localhost:5000/contacts.json', {
+        params: query,
+      })
+      .then((response) => {
+        setContactList(response.data);
+        setPageMeta({
+          total: response.data.total,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const isOpen = useMemo(
+    () => [MODALS.MODAL_A, MODALS.MODAL_B].includes(modalType),
+    [modalType]
+  );
+
+  const openDetailsModal = (contact) => {
+    setContactsDetail(contact);
+  };
+
+  const closeDetailsModal = () => {
+    setContactsDetail(null);
+  };
+
+  useEffect(() => {
+    if (modalType) {
+      setLoading(true);
+      getContacts();
+    }
+  }, [modalType]);
+
+
+
+  const handleSearchQuery = useMemo(() => debounce((e) => {
+    getContacts(e.target.value);
+  }, 1000), []);
+
+  const searchChange = (e) => {
+    setSearchQuery(e.target.value);
+    handleSearchQuery(e);
+  };
+
+  if (loading) {
+    return <Loader />;
+  }
+
+  if (contactsDetail) {
+    return (
+      <CustomModal open={true} handleClose={closeDetailsModal}>
+        <div>
+          <label>Email:</label> <span>{contactsDetail.email}</span>
+          <label>Phone:</label> <span>{contactsDetail.full_phone_number}</span>
+          <label>Phone:</label> <span>{contactsDetail.country.iso}</span>
+        </div>
+      </CustomModal>
+    );
+  }
+
+  
+  return (
+    <CustomModal open={isOpen} handleClose={onClose}>
+      <SearchInput
+        value={searchQuery}
+        onChange={searchChange}
+        enterKeyHandler={(e) => {
+          handleSearchQuery.cancel()
+          getContacts(e.target.value);
+        }}
+      />
+      {contactList.contacts_ids.map((contactId) => {
+        return (
+          <div
+            key={contactId}
+            onClick={() => openDetailsModal(contactList.contacts[contactId])}
+          >
+            <label>Email:</label>{' '}
+            <span>{contactList.contacts[contactId].email}</span>
+            <label>Phone:</label>{' '}
+            <span>{contactList.contacts[contactId].full_phone_number}</span>
+            <label>Phone:</label>{' '}
+            <span>{contactList.contacts[contactId].country.iso}</span>
+          </div>
+        );
+      })}
+    </CustomModal>
+  );
+}
+
+export default ContactsModal;

@@ -1,0 +1,52 @@
+@import '../../../Assets/scss/base';
+
+$size: 70px;
+
+.loaderModal{
+    @include flexCenter;
+    @include position($fixed, $top: 0, $left: 0);
+    background-color: rgba($black-color, .75);
+    width: 100vw;
+    height: 100vh;
+    z-index: 10000000;
+}
+
+.loader {
+    width: $size;
+    height: $size;
+    border: 3px dotted $white-color;
+    border-style: solid solid dotted dotted;
+    @include border-radius (50%);
+    display: $inline-block;
+    position: $relative;
+    animation: rotation 2s linear infinite;
+    &:after {
+        content: '';
+        margin: $auto;
+        @include position($absolute, $top: 0, $left: 0, $right:0, $bottom: 0);
+        border: 3px dotted $orange-color;
+        border-style: solid solid dotted;
+        width: calc($size/2);
+        height: calc($size/2);
+        @include border-radius (50%);
+        animation: rotationBack 1s linear infinite;
+        transform-origin: $center $center;
+    }
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg)
+    }
+    100% {
+        transform: rotate(360deg)
+    }
+}
+@keyframes rotationBack {
+    0% {
+        transform: rotate(0deg)
+    }
+    100% {
+        transform: rotate(-360deg)
+    }
+}

@@ -1,0 +1,102 @@
+@import '../../../assets/scss/base';
+
+.modal {
+    @include position($fixed, $top:0, $right: 0);
+    background: rgba($primary-color, .7);
+    width: 100%;
+    height: 100%;
+    display: $block;
+    overflow-x: $hidden;
+    overflow-y: $auto;
+    z-index: 99999;
+    &-backdrop {
+        @include position($fixed, $top: 0, $left: 0%);
+        width: 100%; height: 100%;
+        background: rgba($secondary-color, .2);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        z-index: 9;
+    }
+    &-drawer{
+        @media (min-width:991px){
+            max-width: 60%;
+        }
+    }
+    &-dialog {
+        width: $auto;
+        margin: 0.5rem;
+        pointer-events: $none;
+        @media (min-width: 576px){
+            max-width: 500px;
+            margin: 1.75rem $auto;
+        }
+        &-centered {
+            @include flexbox;
+            @include align-items ($center);
+            min-height: calc(100% - 1rem);
+            @media (min-width: 576px) {
+                min-height: calc(100% - 3.5rem);
+            }
+        }
+    }
+    &-sm {
+        @media (min-width:576px){
+            max-width: 360px;
+        }
+    }
+    &-md {
+        @media (min-width:576px){
+            max-width: 520px;
+        }
+    }
+    &-xl {
+        @media (min-width:576px){
+            max-width: 550px;
+        }
+        @media (min-width: 992px){
+            max-width: 950px;
+        }
+    }
+    &-content {
+        pointer-events: $auto;
+        background-clip: padding-box;
+        @include flex-direction (column);
+        @include flexbox;
+        width: 100%;
+        padding: 20px;
+        outline: 0; border: 0;
+        background-color: $white-color;
+        @include border-radius (15px);
+        position: $relative;
+        z-index: 10;
+        @at-root {
+            .close {
+                @include position($fixed, $top: 10px, $right: 10px);
+                @include transition (all, .5s, ease-in-out);
+                @include border-radius (40px);
+                background: $transparent;
+                @include flexCenter();
+                background: $black-color;
+                text-align: $center;
+                cursor: $pointer;
+                padding: 4px;
+                border: 0;
+                width: 40px; height: 40px;
+                z-index: 11;
+                &:hover {
+                    background: $primary-color;
+                }
+                svg {
+                    width: 14px;
+                    height: 14px;
+                    path {
+                        fill: $white-color;
+                    }
+                }
+            }
+        }
+    }
+    &-header {
+        padding: 1rem 1.5rem;
+    }
+}

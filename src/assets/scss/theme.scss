@@ -1,0 +1,19 @@
+@import '../scss/base';
+
+* {
+    box-sizing: border-box;
+}
+html {
+    overflow: $hidden;
+    scroll-behavior: smooth;
+}
+body {
+    margin: 0;
+    @extend html;
+    color: $primary-color;
+    font-family: $montserrat-font;
+    font-weight: $font-regular;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: $amorny-light-blue-color-600;
+}

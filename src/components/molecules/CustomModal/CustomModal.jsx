@@ -13,7 +13,7 @@ function CustomModal({
   }
   return (
     <>
-      <div className={`modal ${className}`}>
+      <div className={`modal show ${className}`}>
         <div className="modal-backdrop" onClick={handleClose} />
         <div className={`modal-dialog modal-${size}`}>
           <div className="modal-content">

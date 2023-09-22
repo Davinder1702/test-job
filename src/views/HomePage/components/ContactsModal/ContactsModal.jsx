@@ -144,21 +144,22 @@ function ContactsModal({ modalType, onClose }) {
         }}
       />
       <Scrollbars style={{ height: '400px' }} onScrollFrame={handleScroll}>
+        <ul className="list-group">
         {getFilteredData()?.map((contactId) => {
         return (
-          <div
-            key={contactId}
-            onClick={() => openDetailsModal(contactList.contacts[contactId])}
-          >
+          <li key={contactId}
+          onClick={() => openDetailsModal(contactList.contacts[contactId])} className="list-group-item d-flex justify-content-between align-items-center">
             <label>Email:</label>{' '}
             <span>{contactList.contacts[contactId].email}</span>
             <label>Phone:</label>{' '}
             <span>{contactList.contacts[contactId].full_phone_number}</span>
             <label>Phone:</label>{' '}
             <span>{contactList.contacts[contactId].country.iso}</span>
-          </div>
+        </li>
         );
+        
       })}
+      </ul>
       </Scrollbars>
       <CheckBoxField 
         onChange={handleShowEven}

@@ -107,21 +107,22 @@ function ContactsModal({ modalType, onClose }) {
           getContacts(e.target.value);
         }}
       />
+      <ul className="list-group">
       {contactList.contacts_ids.map((contactId) => {
         return (
-          <div
-            key={contactId}
-            onClick={() => openDetailsModal(contactList.contacts[contactId])}
-          >
+          <li key={contactId}
+          onClick={() => openDetailsModal(contactList.contacts[contactId])} className="list-group-item d-flex justify-content-between align-items-center">
             <label>Email:</label>{' '}
             <span>{contactList.contacts[contactId].email}</span>
             <label>Phone:</label>{' '}
             <span>{contactList.contacts[contactId].full_phone_number}</span>
             <label>Phone:</label>{' '}
             <span>{contactList.contacts[contactId].country.iso}</span>
-          </div>
+        </li>
         );
       })}
+      </ul>
+      
     </CustomModal>
   );
 }

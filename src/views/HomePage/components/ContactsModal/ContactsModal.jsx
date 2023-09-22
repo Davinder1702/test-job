@@ -1,14 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { Scrollbars } from 'react-custom-scrollbars';
 import axiosInstance from '../../../../services/api';
 import CustomModal from '../../../../components/molecules/CustomModal/CustomModal';
 import { MODALS } from '../../../../shared/Constant';
 import Loader from '../../../../components/atoms/Loader/Loader';
 import SearchInput from '../../../../components/atoms/SearchInput/SearchInput';
 import { debounce } from '../../../../shared/Untils';
+import CheckBoxField from '../../../../components/atoms/CheckBox/CheckBoxField';
 
 function ContactsModal({ modalType, onClose }) {
   const [contactList, setContactList] = useState({
     contacts_ids: [],
+    contacts : [] ,
   });
   const [contactsDetail, setContactsDetail] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -17,8 +20,11 @@ function ContactsModal({ modalType, onClose }) {
     currentPage: 1,
     total: 0,
   });
+  const[showEvenContactIds, setShowEvenContactIds] = useState(false)
+  const DATA_PER_PAGE = 20;
 
   const getContacts = (search) => {
+    
     const query = {
       page: pageMeta.currentPage,
       companyId: 171,
@@ -32,14 +38,15 @@ function ContactsModal({ modalType, onClose }) {
     }
     
     axiosInstance
-      .get('http://localhost:5000/contacts.json', {
+      .get('https://demo6078420.mockable.io/contact.json', {
         params: query,
       })
       .then((response) => {
-        setContactList(response.data);
-        setPageMeta({
+        setContactList((prev)=> ({contacts_ids: [...prev.contacts_ids, ...response?.data?.contacts_ids], contacts: {...prev?.contacts, ...response?.data?.contacts}}));
+        setPageMeta((prev) => ({
+          currentPage: prev.currentPage++,
           total: response.data.total,
-        });
+        }));
       })
       .catch((error) => {
         console.log(error);
@@ -80,6 +87,35 @@ function ContactsModal({ modalType, onClose }) {
     handleSearchQuery(e);
   };
 
+  const hasMoreData = ()=>{
+    return (pageMeta.currentPage != pageMeta.total / DATA_PER_PAGE)
+  }
+
+  const loadMoreData = () => {
+    if (loading || !hasMoreData()) return;
+    getContacts()
+  };
+
+  const handleScroll = (values) => {
+    const { scrollTop, scrollHeight, clientHeight } = values;
+    if (scrollHeight - scrollTop === clientHeight) {
+      loadMoreData();
+    }
+  };
+
+  const handleShowEven = (e)=>{
+    const value = e.target.checked;
+    setShowEvenContactIds(value);
+  }
+  const getFilteredData = ()=> {
+    if (showEvenContactIds) {
+      return [...contactList.contacts_ids].filter(item => item % 2 === 0) || [];
+    }
+    else {
+      return [...contactList?.contacts_ids]
+    }
+  }
+
   if (loading) {
     return <Loader />;
   }
@@ -96,7 +132,7 @@ function ContactsModal({ modalType, onClose }) {
     );
   }
 
-  
+
   return (
     <CustomModal open={isOpen} handleClose={onClose}>
       <SearchInput
@@ -107,7 +143,8 @@ function ContactsModal({ modalType, onClose }) {
           getContacts(e.target.value);
         }}
       />
-      {contactList.contacts_ids.map((contactId) => {
+      <Scrollbars style={{ height: '400px' }} onScrollFrame={handleScroll}>
+        {getFilteredData()?.map((contactId) => {
         return (
           <div
             key={contactId}
@@ -122,6 +159,14 @@ function ContactsModal({ modalType, onClose }) {
           </div>
         );
       })}
+      </Scrollbars>
+      <CheckBoxField 
+        onChange={handleShowEven}
+        id="checkbox"
+        checked = {showEvenContactIds}
+      />
+        
+
     </CustomModal>
   );
 }
